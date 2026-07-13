@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            --primary: #1e1b4b;
+            --primary-light: #6366f1;
+            --accent: #a855f7;
+            --bg-dashboard: #f1f5f9;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dashboard);
+            color: #0f172a;
+        }
+
+        h1, h2, h3, h4, h5, h6, .navbar-brand {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .navbar {
+            background: #ffffff !important;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .navbar-brand {
+            font-weight: 800;
+            color: #0f172a !important;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .dash-card {
+            background: #white;
+            background-color: white;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -1px rgba(0,0,0,0.01);
+            margin-bottom: 24px;
+        }
+
+        .dash-card-header {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: #1e293b;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Vital stats grid */
+        .vital-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .vital-item {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .vital-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .vital-icon.blue { background: #dbeafe; color: #2563eb; }
+        .vital-icon.green { background: #d1fae5; color: #059669; }
+        .vital-icon.purple { background: #f3e8ff; color: #7c3aed; }
+        .vital-icon.orange { background: #fef3c7; color: #d97706; }
+
+        /* Configuration pills */
+        .config-pill {
+            padding: 10px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            background: white;
+            font-weight: 600;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            flex: 1;
+        }
+
+        .config-pill.active {
+            border-color: var(--primary-light);
+            background: rgba(99, 102, 241, 0.05);
+            color: var(--primary-light);
+        }
+
+        .config-pill:hover:not(.active) {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+        }
+
+        .btn-add-to-cart {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            color: white;
+            font-weight: 700;
+            font-size: 1.05rem;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .btn-add-to-cart:hover {
+            box-shadow: 0 10px 25px rgba(30, 27, 75, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* 3D view controls */
+        .control-btn {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .control-btn.active {
+            background: #0f172a;
+            color: white;
+            border-color: #0f172a;
+        }
+
+        /* Donut chart mock */
+        .chart-donut {
+            width: 120px;
+            height: 120px;
+            position: relative;
+        }
+
+        .chart-legend {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .chart-legend li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top py-3">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-extrabold" href="index.html">
+                <i class="bi bi-shield-check me-2"></i>ZENITH
+            </a>
+            <div class="navbar-nav ms-auto align-items-center gap-2">
+                <a class="nav-link px-3" href="index.html"><i class="bi bi-house me-1"></i>Home</a>
+                <a class="nav-link px-3" href="cart.html"><i class="bi bi-cart3 me-1"></i>Cart</a>
+                <a class="nav-link px-3" href="#" onclick="logout()"><i class="bi bi-box-arrow-right me-1 text-danger"></i>Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Grid -->
+    <div class="dashboard-container">
+        <div class="row g-4">
+            
+            <!-- LEFT PANEL: Stats & Sales Overview -->
+            <div class="col-lg-3">
+                
+                <!-- Product Vitals -->
+                <div class="dash-card">
+                    <div class="dash-card-header">Product Vital Monitoring</div>
+                    <div class="vital-grid">
+                        <div class="vital-item">
+                            <div class="vital-icon blue"><i class="bi bi-boxes"></i></div>
+                            <div>
+                                <div class="text-muted small fw-semibold">In Stock</div>
+                                <div class="fw-bold" id="vitalStock">0</div>
+                            </div>
+                        </div>
+                        <div class="vital-item">
+                            <div class="vital-icon green"><i class="bi bi-currency-rupee"></i></div>
+                            <div>
+                                <div class="text-muted small fw-semibold">Price</div>
+                                <div class="fw-bold" id="vitalPrice">₹0</div>
+                            </div>
+                        </div>
+                        <div class="vital-item">
+                            <div class="vital-icon purple"><i class="bi bi-lightning-charge"></i></div>
+                            <div>
+                                <div class="text-muted small fw-semibold">Velocity</div>
+                                <div class="fw-bold">48 / day</div>
+                            </div>
+                        </div>
+                        <div class="vital-item">
+                            <div class="vital-icon orange"><i class="bi bi-star-fill"></i></div>
+                            <div>
+                                <div class="text-muted small fw-semibold">Rating</div>
+                                <div class="fw-bold">4.8 / 5</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-grid mt-4">
+                        <button class="btn btn-light rounded-pill py-2.5 fw-semibold border"><i class="bi bi-rocket-takeoff-fill me-2 text-primary"></i>Run Campaign</button>
+                    </div>
+                </div>
+
+                <!-- Product Overview (Donut chart) -->
+                <div class="dash-card">
+                    <div class="dash-card-header">Product Overview</div>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="chart-donut">
+                            <svg viewBox="0 0 36 36" class="circular-chart" style="width: 100%; height: 100%;">
+                                <path class="circle-bg" stroke="#f1f5f9" stroke-width="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path class="circle" stroke="#6366f1" stroke-width="3" stroke-dasharray="60, 100" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path class="circle" stroke="#10b981" stroke-width="3" stroke-dasharray="25, 100" stroke-dashoffset="-60" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path class="circle" stroke="#ef4444" stroke-width="3" stroke-dasharray="15, 100" stroke-dashoffset="-85" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            </svg>
+                        </div>
+                        <ul class="chart-legend">
+                            <li><span class="legend-color" style="background: #6366f1;"></span><span>Sales: 60%</span></li>
+                            <li><span class="legend-color" style="background: #10b981;"></span><span>Profit: 25%</span></li>
+                            <li><span class="legend-color" style="background: #ef4444;"></span><span>Expenses: 15%</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- CENTER PANEL: Product View -->
+            <div class="col-lg-6">
+                <div class="dash-card d-flex flex-column justify-content-between h-100" style="min-height: 550px;">
+                    <div>
+                        <h4 class="fw-bold mb-1" id="productTitle">Loading...</h4>
+                        <span class="badge bg-secondary mb-3">Model Preview</span>
+                    </div>
+
+                    <!-- Canvas/Preview Area -->
+                    <div class="d-flex align-items-center justify-content-center bg-light border rounded-4 p-4 my-3 position-relative" style="height: 350px;">
+                        <img src="" id="bigPreviewImage" alt="Preview Image" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                        
+                        <!-- Thumbnail variations -->
+                        <div class="position-absolute d-flex flex-column gap-2" style="right: 15px; top: 15px;">
+                            <div class="border rounded p-1 bg-white" style="width: 40px; height: 40px; cursor: pointer;"><img src="" id="thumb1" class="w-100 h-100 object-fit-cover" onclick="changeImageSrc(this.src)"></div>
+                            <div class="border rounded p-1 bg-white" style="width: 40px; height: 40px; cursor: pointer;"><img src="" id="thumb2" class="w-100 h-100 object-fit-cover" onclick="changeImageSrc(this.src)"></div>
+                        </div>
+                    </div>
+
+                    <!-- 3D Controls bottom bar -->
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-3 border-top">
+                        <div class="d-flex gap-2">
+                            <button class="control-btn" id="ctrlCatwalk">Catwalk</button>
+                            <button class="control-btn" id="ctrlIdle">Idle</button>
+                            <button class="control-btn active" id="ctrl3D">3D View</button>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="small fw-semibold text-muted">Movement Speed</span>
+                            <input type="range" class="form-range" style="width: 120px;" min="1" max="100" value="50">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: Config & Details -->
+            <div class="col-lg-3">
+                
+                <!-- Model configuration -->
+                <div class="dash-card">
+                    <div class="dash-card-header">Configuration & Edit</div>
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted mb-2">Model Configuration</label>
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <span class="small text-muted">Texture Intensity</span>
+                            <input type="range" class="form-range" min="1" max="100" value="60">
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between gap-3">
+                            <span class="small text-muted">Gloss</span>
+                            <select class="form-select form-select-sm border-2 fw-semibold" style="width: 120px;">
+                                <option value="matte">Matte</option>
+                                <option value="glossy">Glossy</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Size pills -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted mb-2">Size Selector</label>
+                        <div class="d-flex gap-2 mb-2">
+                            <div class="config-pill" onclick="selectSize(this)">XS</div>
+                            <div class="config-pill" onclick="selectSize(this)">S</div>
+                            <div class="config-pill active" onclick="selectSize(this)">M</div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="config-pill" onclick="selectSize(this)">L</div>
+                            <div class="config-pill" onclick="selectSize(this)">XL</div>
+                            <div class="config-pill" onclick="selectSize(this)">XXL</div>
+                        </div>
+                    </div>
+
+                    <!-- Fit type -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted mb-2">Fit Type</label>
+                        <div class="d-flex gap-2">
+                            <div class="config-pill active" onclick="selectFit(this)">Slim</div>
+                            <div class="config-pill" onclick="selectFit(this)">Regular</div>
+                            <div class="config-pill" onclick="selectFit(this)">Oversized</div>
+                        </div>
+                    </div>
+
+                    <!-- Fabric Behavior -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted mb-2">Fabric Behavior</label>
+                        <select class="form-select border-2">
+                            <option value="medium">Stiffness (Medium)</option>
+                            <option value="high">Stiffness (High)</option>
+                            <option value="low">Stiffness (Low)</option>
+                        </select>
+                    </div>
+
+                    <!-- Product Details -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted mb-2">Product Details</label>
+                        <div class="bg-light p-3 rounded-3 border">
+                            <h6 class="fw-bold mb-1" id="detailTitle">Product Name</h6>
+                            <p class="small text-muted mb-0" id="detailDesc">Product details descriptions...</p>
+                        </div>
+                    </div>
+
+                    <button class="btn-add-to-cart" id="btnAddToCart">
+                        <i class="bi bi-cart-plus-fill me-2"></i>Add to Cart
+                    </button>
+                    <div id="toastMessage" class="mt-3"></div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "http://localhost:5000/api/products";
+        const token = localStorage.getItem("token");
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get("id");
+        let selectedProduct = null;
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            if (!productId) {
+                window.location.href = "index.html";
+                return;
+            }
+            await fetchProductDetails();
+        });
+
+        async function fetchProductDetails() {
+            try {
+                const response = await fetch(API_URL);
+                const result = await response.json();
+                selectedProduct = result.data.find(p => p.id == productId);
+
+                if (!selectedProduct) {
+                    alert("Product not found");
+                    window.location.href = "index.html";
+                    return;
+                }
+
+                // Populate UI
+                document.getElementById("productTitle").textContent = selectedProduct.name;
+                document.getElementById("detailTitle").textContent = selectedProduct.name;
+                document.getElementById("detailDesc").textContent = selectedProduct.description || "No description provided.";
+                document.getElementById("vitalStock").textContent = selectedProduct.stock;
+                document.getElementById("vitalPrice").textContent = `₹${selectedProduct.price}`;
+                
+                const imageSrc = selectedProduct.image 
+                    ? (selectedProduct.image.startsWith('http') ? selectedProduct.image : `assets/${selectedProduct.image}`) 
+                    : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80';
+                document.getElementById("bigPreviewImage").src = imageSrc;
+                document.getElementById("thumb1").src = imageSrc;
+                document.getElementById("thumb2").src = imageSrc;
+
+                // Add to Cart handler
+                document.getElementById("btnAddToCart").onclick = () => addToCart(selectedProduct.id);
+
+            } catch (error) {
+                console.error("Failed to load details:", error);
+            }
+        }
+
+        function changeImageSrc(src) {
+            document.getElementById("bigPreviewImage").src = src;
+        }
+
+        function selectSize(element) {
+            element.parentElement.parentElement.querySelectorAll(".config-pill").forEach(el => el.classList.remove("active"));
+            element.classList.add("active");
+        }
+
+        function selectFit(element) {
+            element.parentElement.querySelectorAll(".config-pill").forEach(el => el.classList.remove("active"));
+            element.classList.add("active");
+        }
+
+        async function addToCart(productId) {
+            if (!token) {
+                alert("Please login to add items to cart");
+                window.location.href = "login.html";
+                return;
+            }
+
+            try {
+                const response = await fetch("http://localhost:5000/api/cart", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ product_id: productId, quantity: 1 })
+                });
+
+                const result = await response.json();
+                const toast = document.getElementById("toastMessage");
+                
+                if (result.success) {
+                    toast.innerHTML = `<div class="alert alert-success py-2 border-0"><i class="bi bi-check-circle-fill me-2"></i>Added to cart!</div>`;
+                } else {
+                    toast.innerHTML = `<div class="alert alert-danger py-2 border-0"><i class="bi bi-exclamation-circle-fill me-2"></i>${result.message}</div>`;
+                }
+                setTimeout(() => toast.innerHTML = "", 3000);
+            } catch (error) {
+                alert("Add to cart failed");
+            }
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = "login.html";
+        }
+    </script>
+</body>
+</html>
