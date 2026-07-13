@@ -1,6 +1,6 @@
-const API_URL = "http://localhost:5000/api/products";
-const ORDERS_API_URL = "http://localhost:5000/api/orders/all";
-const USERS_API_URL = "http://localhost:5000/api/auth/users";
+const API_URL = "https://online-shopping-cp0g.onrender.com/api/products";
+const ORDERS_API_URL = "https://online-shopping-cp0g.onrender.com/api/orders/all";
+const USERS_API_URL = "https://online-shopping-cp0g.onrender.com/api/auth/users";
 
 const token = localStorage.getItem("token");
 const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -195,7 +195,7 @@ window.loadOrders = loadOrders;
 
 async function updateOrderStatus(orderId, status) {
     try {
-        const response = await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
+        const response = await fetch(`https://online-shopping-cp0g.onrender.com/api/orders/${orderId}/status`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -368,7 +368,7 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
                 const formData = new FormData();
                 formData.append("image", fileInput.files[0]);
 
-                const uploadRes = await fetch("http://localhost:5000/api/products/upload", {
+                const uploadRes = await fetch("https://online-shopping-cp0g.onrender.com/api/products/upload", {
                     method: "POST",
                     headers: { "Authorization": `Bearer ${token}` },
                     body: formData

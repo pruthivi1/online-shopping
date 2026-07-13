@@ -1,7 +1,7 @@
 import { createProductCard } from "./components/productCard.js";
 
-const API_URL = "http://localhost:5000/api/products";
-const CART_API = "http://localhost:5000/api/cart";
+const API_URL = "https://online-shopping-cp0g.onrender.com/api/products";
+const CART_API = "https://online-shopping-cp0g.onrender.com/api/cart";
 // just to check it was working or not
 // console.log('App.js Loaded');
 // alert("App.js Loaded");
@@ -133,7 +133,7 @@ async function loadCategories() {
     if (!dropdownMenu) return;
 
     try {
-        const response = await fetch("http://localhost:5000/api/categories");
+        const response = await fetch("https://online-shopping-cp0g.onrender.com/api/categories");
         const result = await response.json();
         if (result.success && result.data) {
             let html = "";
