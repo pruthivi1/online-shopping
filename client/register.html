@@ -214,7 +214,10 @@
     </div>
 
     <script>
-        const API_URL = "https://online-shopping-cp0g.onrender.com/api/auth";
+        const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:")
+            ? "http://localhost:5000"
+            : "https://online-shopping-cp0g.onrender.com";
+        const API_URL = `${API_BASE}/api/auth`;
 
         // Password strength indicator
         document.getElementById("password").addEventListener("input", (e) => {

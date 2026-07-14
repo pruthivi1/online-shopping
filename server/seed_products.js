@@ -1,6 +1,4 @@
 const mysql = require("mysql2");
-const fs = require("fs");
-const path = require("path");
 require("dotenv").config();
 
 const connection = mysql.createConnection({
@@ -10,6 +8,58 @@ const connection = mysql.createConnection({
     database: process.env.DB_NAME || "online_shoping"
 });
 
+const MOCK_PRODUCTS = [
+    {
+        title: "Wireless Noise-Cancelling Headphones",
+        description: "Premium sound quality with active noise cancellation and 30-hour battery life.",
+        price: 8999.00,
+        images: ["https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80"],
+        category: { name: "Electronics" }
+    },
+    {
+        title: "Mechanical Gaming Keyboard",
+        description: "Tactile blue switches, RGB backlighting, and durable aluminum top frame.",
+        price: 4500.00,
+        images: ["https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?auto=format&fit=crop&w=600&q=80"],
+        category: { name: "Electronics" }
+    },
+    {
+        title: "Ultra-Lightweight Running Shoes",
+        description: "Breathable mesh upper and responsive cushioning for maximum comfort.",
+        price: 3200.00,
+        images: ["https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80"],
+        category: { name: "Clothing" }
+    },
+    {
+        title: "Minimalist Leather Wallet",
+        description: "Genuine top-grain leather with RFID blocking technology.",
+        price: 1200.00,
+        images: ["https://images.unsplash.com/photo-1627124765135-56c33fc3a1cd?auto=format&fit=crop&w=600&q=80"],
+        category: { name: "Clothing" }
+    },
+    {
+        title: "Stainless Steel Coffee Maker",
+        description: "12-cup programmable coffee maker with strength control and auto shut-off.",
+        price: 2499.00,
+        images: ["https://images.unsplash.com/photo-1517256064527-09c53b2d0bc6?auto=format&fit=crop&w=600&q=80"],
+        category: { name: "Home & Kitchen" }
+    },
+    {
+        title: "Smart Thermostat",
+        description: "Wi-Fi enabled smart thermostat to save energy and control temperature from anywhere.",
+        price: 12999.00,
+        images: ["https://images.unsplash.com/photo-1567016432779-094069958ea5?auto=format&fit=crop&w=600&q=80"],
+        category: { name: "Home & Kitchen" }
+    },
+    {
+        title: "Introduction to Algorithms",
+        description: "The classic guide to computer algorithms, covering a broad range of topics in depth.",
+        price: 999.00,
+        images: ["https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=600&q=80"],
+        category: { name: "Books" }
+    }
+];
+
 connection.connect((err) => {
     if (err) {
         console.error("Connection failed:", err.message);
@@ -17,49 +67,30 @@ connection.connect((err) => {
     }
     console.log("Connected to database successfully!");
 
-    // Read the content.md file which contains the JSON products array
-    const filepath = "C:\\Users\\gangi\\.gemini\\antigravity\\brain\\c5757239-5e40-48a0-87fe-2d523722478f\\.system_generated\\steps\\117\\content.md";
-    try {
-        const fileContent = fs.readFileSync(filepath, "utf8");
-        const lines = fileContent.split("\n");
-        // Find the line starting with [{"id":1
-        const jsonLine = lines.find(l => l.trim().startsWith("[{\"id\":1"));
-        if (!jsonLine) {
-            console.error("Could not find JSON line in content.md");
-            process.exit(1);
+    // Clear existing tables
+    connection.query("SET FOREIGN_KEY_CHECKS = 0", (err) => {
+        if (err) throw err;
+
+        const clearQueries = [
+            "TRUNCATE TABLE Order_Items",
+            "TRUNCATE TABLE Orders",
+            "TRUNCATE TABLE Cart",
+            "TRUNCATE TABLE Products",
+            "TRUNCATE TABLE Categories"
+        ];
+
+        let cleared = 0;
+        for (let q of clearQueries) {
+            connection.query(q, (err) => {
+                if (err) console.error("Truncate failed:", err.message);
+                cleared++;
+                if (cleared === clearQueries.length) {
+                    console.log("Cleared all existing e-commerce tables.");
+                    insertCategoriesAndProducts(MOCK_PRODUCTS);
+                }
+            });
         }
-
-        const products = JSON.parse(jsonLine.trim());
-        console.log(`Loaded ${products.length} products from file.`);
-
-        // Clear existing tables
-        connection.query("SET FOREIGN_KEY_CHECKS = 0", (err) => {
-            if (err) throw err;
-
-            const clearQueries = [
-                "TRUNCATE TABLE Order_Items",
-                "TRUNCATE TABLE Orders",
-                "TRUNCATE TABLE Cart",
-                "TRUNCATE TABLE Products",
-                "TRUNCATE TABLE Categories"
-            ];
-
-            let cleared = 0;
-            for (let q of clearQueries) {
-                connection.query(q, (err) => {
-                    if (err) console.error("Truncate failed:", err.message);
-                    cleared++;
-                    if (cleared === clearQueries.length) {
-                        console.log("Cleared all existing e-commerce tables.");
-                        insertCategoriesAndProducts(products);
-                    }
-                });
-            }
-        });
-    } catch (e) {
-        console.error("Error reading/parsing file:", e.message);
-        process.exit(1);
-    }
+    });
 });
 
 function insertCategoriesAndProducts(products) {
@@ -75,7 +106,7 @@ function insertCategoriesAndProducts(products) {
     console.log(`Found ${categoriesList.length} unique categories.`);
 
     let categoriesInserted = 0;
-    const categoryIdMap = {}; // Maps original category ID/name to new database ID
+    const categoryIdMap = {}; // Maps original category name to new database ID
 
     if (categoriesList.length === 0) {
         insertProducts(products, categoryIdMap);
@@ -83,8 +114,8 @@ function insertCategoriesAndProducts(products) {
     }
 
     categoriesList.forEach(cat => {
-        // The table Categories uses 'category_name' in the user's database
-        connection.query("INSERT INTO Categories (category_name) VALUES (?)", [cat.name], (err, result) => {
+        // Table Categories uses 'name' column
+        connection.query("INSERT INTO Categories (name) VALUES (?)", [cat.name], (err, result) => {
             if (err) {
                 console.error(`Failed to insert category ${cat.name}:`, err.message);
             } else {

@@ -1,7 +1,11 @@
 import { createProductCard } from "./components/productCard.js";
 
-const API_URL = "https://online-shopping-cp0g.onrender.com/api/products";
-const CART_API = "https://online-shopping-cp0g.onrender.com/api/cart";
+const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:")
+    ? "http://localhost:5000"
+    : "https://online-shopping-cp0g.onrender.com";
+
+const API_URL = `${API_BASE}/api/products`;
+const CART_API = `${API_BASE}/api/cart`;
 // just to check it was working or not
 // console.log('App.js Loaded');
 // alert("App.js Loaded");
@@ -133,7 +137,7 @@ async function loadCategories() {
     if (!dropdownMenu) return;
 
     try {
-        const response = await fetch("https://online-shopping-cp0g.onrender.com/api/categories");
+        const response = await fetch(`${API_BASE}/api/categories`);
         const result = await response.json();
         if (result.success && result.data) {
             let html = "";
@@ -315,9 +319,6 @@ document.addEventListener("DOMContentLoaded", () => {
         e.stopPropagation(); // Prevent closing dropdown
         saveNotifications([]);
     });
-});
-
-
 
     // Check login status on page load
     const userData = JSON.parse(localStorage.getItem("user") || "null");
@@ -333,11 +334,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const ordersLink = document.getElementById("ordersLink");
         if (ordersLink) ordersLink.style.display = "block";
     }
-    
-    function logout() {
-        localStorage.clear();
-        window.location.reload();
-    }
-    window.logout = logout;
+});
 
-loadProducts();
+function logout() {
+    localStorage.clear();
+    window.location.reload();
+}
+window.logout = logout;

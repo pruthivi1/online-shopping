@@ -263,23 +263,23 @@
     </div>
 
     <script>
-        const API_URL = "https://online-shopping-cp0g.onrender.com/api/auth";
+        const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:")
+            ? "http://localhost:5000"
+            : "https://online-shopping-cp0g.onrender.com";
+        const API_URL = `${API_BASE}/api/auth`;
         let selectedRole = "customer";
 
-        // Role selector
         function selectRole(element) {
             document.querySelectorAll('.role-option').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
             selectedRole = element.dataset.role;
         }
 
-        // Check if already logged in
         window.addEventListener('DOMContentLoaded', () => {
             const token = localStorage.getItem("token");
             const user = JSON.parse(localStorage.getItem("user") || "{}");
             
             if (token && user.role) {
-                // Auto-redirect based on role
                 redirectBasedOnRole(user.role);
             }
         });
@@ -320,24 +320,20 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    // Save to localStorage
                     localStorage.setItem("token", result.token);
                     localStorage.setItem("user", JSON.stringify(result.user));
                     
-                    // Show success
                     msgDiv.innerHTML = `
                         <div class="alert alert-success">
                             <i class="bi bi-check-circle-fill me-2"></i>Login successful! Redirecting...
                         </div>
                     `;
                     
-                    // Redirect based on role
                     setTimeout(() => {
                         redirectBasedOnRole(result.user.role);
                     }, 1000);
                     
                 } else {
-                    // Show error
                     msgDiv.innerHTML = `
                         <div class="alert alert-danger">
                             <i class="bi bi-exclamation-circle-fill me-2"></i>${result.message}
