@@ -74,6 +74,110 @@ const initDb = (connection) => {
         )`
     ];
 
+    const seedProductsIfEmpty = (conn) => {
+        conn.query("SELECT COUNT(*) as count FROM Products", (err, rows) => {
+            if (err || (rows && rows[0] && rows[0].count > 0)) {
+                return;
+            }
+
+            console.log("No products found in database. Starting auto-seeding products...");
+
+            conn.query("SELECT id, name FROM Categories", (err, catRows) => {
+                if (err || !catRows || catRows.length === 0) {
+                    console.error("Failed to fetch categories for product seeding");
+                    return;
+                }
+
+                const categoryMap = {};
+                catRows.forEach(row => {
+                    categoryMap[row.name] = row.id;
+                });
+
+                const MOCK_PRODUCTS = [
+                    {
+                        name: "Wireless Noise-Cancelling Headphones",
+                        description: "Premium sound quality with active noise cancellation and 30-hour battery life.",
+                        price: 8999.00,
+                        stock: 15,
+                        image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80",
+                        category_name: "Electronics"
+                    },
+                    {
+                        name: "Mechanical Gaming Keyboard",
+                        description: "Tactile blue switches, RGB backlighting, and durable aluminum top frame.",
+                        price: 4500.00,
+                        stock: 15,
+                        image: "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?auto=format&fit=crop&w=600&q=80",
+                        category_name: "Electronics"
+                    },
+                    {
+                        name: "Ultra-Lightweight Running Shoes",
+                        description: "Breathable mesh upper and responsive cushioning for maximum comfort.",
+                        price: 3200.00,
+                        stock: 15,
+                        image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80",
+                        category_name: "Clothing"
+                    },
+                    {
+                        name: "Minimalist Leather Wallet",
+                        description: "Genuine top-grain leather with RFID blocking technology.",
+                        price: 1200.00,
+                        stock: 15,
+                        image: "https://images.unsplash.com/photo-1627124765135-56c33fc3a1cd?auto=format&fit=crop&w=600&q=80",
+                        category_name: "Clothing"
+                    },
+                    {
+                        name: "Stainless Steel Coffee Maker",
+                        description: "12-cup programmable coffee maker with strength control and auto shut-off.",
+                        price: 2499.00,
+                        stock: 15,
+                        image: "https://images.unsplash.com/photo-1517256064527-09c53b2d0bc6?auto=format&fit=crop&w=600&q=80",
+                        category_name: "Home & Kitchen"
+                    },
+                    {
+                        name: "Smart Thermostat",
+                        description: "Wi-Fi enabled smart thermostat to save energy and control temperature from anywhere.",
+                        price: 12999.00,
+                        stock: 15,
+                        image: "https://images.unsplash.com/photo-1567016432779-094069958ea5?auto=format&fit=crop&w=600&q=80",
+                        category_name: "Home & Kitchen"
+                    },
+                    {
+                        name: "Introduction to Algorithms",
+                        description: "The classic guide to computer algorithms, covering a broad range of topics in depth.",
+                        price: 999.00,
+                        stock: 15,
+                        image: "https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=600&q=80",
+                        category_name: "Books"
+                    }
+                ];
+
+                let seededCount = 0;
+                MOCK_PRODUCTS.forEach(p => {
+                    const category_id = categoryMap[p.category_name] || null;
+                    const productData = {
+                        name: p.name,
+                        description: p.description,
+                        price: p.price,
+                        stock: p.stock,
+                        image: p.image,
+                        category_id: category_id
+                    };
+
+                    conn.query("INSERT INTO Products SET ?", productData, (err) => {
+                        if (err) {
+                            console.error(`Failed to seed product ${p.name}:`, err.message);
+                        }
+                        seededCount++;
+                        if (seededCount === MOCK_PRODUCTS.length) {
+                            console.log("Seeded mock products successfully!");
+                        }
+                    });
+                });
+            });
+        });
+    };
+
     let errorsOccurred = false;
     let completed = 0;
     
@@ -92,8 +196,13 @@ const initDb = (connection) => {
                     if (!err && rows && rows[0] && rows[0].count === 0) {
                         connection.query("INSERT INTO Categories (name) VALUES ('Electronics'), ('Clothing'), ('Home & Kitchen'), ('Books')", (err) => {
                             if (err) console.error("Category seeding failed:", err.message);
-                            else console.log("Seeded default e-commerce categories.");
+                            else {
+                                console.log("Seeded default e-commerce categories.");
+                                seedProductsIfEmpty(connection);
+                            }
                         });
+                    } else {
+                        seedProductsIfEmpty(connection);
                     }
                 });
             }
