@@ -225,33 +225,32 @@
     .color-box.black { background-color: #0f172a; }
     .color-box.silver { background-color: #cbd5e1; }
 
-    .btn-primary {
-      background-color: #ff6b35 !important;
-      border-color: #ff6b35 !important;
-      color: #ffffff !important;
-      padding: 12px 28px;
-      font-size: 16px;
-      font-weight: 700;
-      transition: all 0.3s ease;
+    .btn-bag {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      border-radius: 50px !important;
-      margin-bottom: 25px;
+      gap: 10px;
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+      color: #fff;
+      padding: 16px 32px;
+      border-radius: 14px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: all 0.3s ease;
+      width: 100%;
+      border: none;
+      margin-bottom: 30px;
     }
 
-    .btn-primary:hover:not(:disabled) {
-      background-color: #e85d2e !important;
-      border-color: #e85d2e !important;
+    .btn-bag:hover:not(:disabled) {
+      box-shadow: 0 10px 25px rgba(30, 27, 75, 0.25);
       transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(255, 107, 53, 0.25) !important;
+      color: #fff;
     }
 
-    .btn-primary:disabled {
-      background-color: #cbd5e1 !important;
-      border-color: #cbd5e1 !important;
-      color: #94a3b8 !important;
+    .btn-bag:disabled {
+      background: #cbd5e1;
+      color: #94a3b8;
       cursor: not-allowed;
     }
 
@@ -447,8 +446,8 @@
           </div>
         </div>
 
-        <button class="btn btn-primary w-100 shadow-sm" id="btnAddToCart">
-          <i class="bi bi-cart-plus"></i> Add to Cart
+        <button class="btn-bag" id="btnAddToCart">
+          <i class="bi bi-bag-plus"></i> Add to bag
         </button>
         <div id="toastMessage"></div>
 
@@ -524,7 +523,7 @@
                 stockBadge.textContent = "In Stock";
                 stockBadge.className = "stock-badge stock-in";
                 btnAddToCart.disabled = false;
-                btnAddToCart.innerHTML = '<i class="bi bi-cart-plus"></i> Add to Cart';
+                btnAddToCart.innerHTML = '<i class="bi bi-bag-plus"></i> Add to Bag';
             } else {
                 stockBadge.textContent = "Out of Stock";
                 stockBadge.className = "stock-badge stock-out";

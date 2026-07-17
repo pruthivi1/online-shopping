@@ -1,7 +1,10 @@
 const db = require("../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const JWT_SECRET = process.env.JWT_SECRET || (process.env.NODE_ENV === "production" ? (() => { throw new Error("JWT_SECRET is required in production"); })() : "fallback-dev-secret-key-change-this-in-production");
+const JWT_SECRET = process.env.JWT_SECRET || (() => {
+    console.warn("WARNING: JWT_SECRET environment variable is not defined! Using fallback-dev-secret-key-change-this-in-production.");
+    return "fallback-dev-secret-key-change-this-in-production";
+})();
 
 // ==================== REGISTER ====================
 const register = async (req, res) => {

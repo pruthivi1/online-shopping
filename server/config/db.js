@@ -178,6 +178,36 @@ const initDb = (connection) => {
         });
     };
 
+    const seedAdminIfEmpty = (conn) => {
+        conn.query("SELECT COUNT(*) as count FROM Users WHERE role = 'admin'", async (err, rows) => {
+            if (err || (rows && rows[0] && rows[0].count > 0)) {
+                return;
+            }
+
+            console.log("No admin user found in database. Starting auto-seeding admin user...");
+            try {
+                const bcrypt = require("bcryptjs");
+                const hashedPassword = await bcrypt.hash("admin123", 10);
+                const adminData = {
+                    username: "admin",
+                    email: "admin@gmail.com",
+                    password: hashedPassword,
+                    role: "admin"
+                };
+
+                conn.query("INSERT INTO Users SET ?", adminData, (err) => {
+                    if (err) {
+                        console.error("Failed to seed admin user:", err.message);
+                    } else {
+                        console.log("Seeded default admin user (admin@gmail.com / admin123) successfully!");
+                    }
+                });
+            } catch (hashErr) {
+                console.error("Failed to hash admin password for seeding:", hashErr.message);
+            }
+        });
+    };
+
     let errorsOccurred = false;
     let completed = 0;
     
@@ -199,10 +229,12 @@ const initDb = (connection) => {
                             else {
                                 console.log("Seeded default e-commerce categories.");
                                 seedProductsIfEmpty(connection);
+                                seedAdminIfEmpty(connection);
                             }
                         });
                     } else {
                         seedProductsIfEmpty(connection);
+                        seedAdminIfEmpty(connection);
                     }
                 });
             }
