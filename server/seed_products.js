@@ -1,12 +1,21 @@
 const mysql = require("mysql2");
 require("dotenv").config();
 
-const connection = mysql.createConnection({
+const connectionConfig = {
     host: process.env.DB_HOST || "localhost",
     user: process.env.DB_USER || "root",
     password: process.env.DB_PASSWORD || "root",
-    database: process.env.DB_NAME || "online_shoping"
-});
+    database: process.env.DB_NAME || "online_shoping",
+    port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 3306
+};
+
+if (process.env.DB_HOST && process.env.DB_HOST !== "localhost" && process.env.DB_HOST !== "127.0.0.1") {
+    connectionConfig.ssl = {
+        rejectUnauthorized: false
+    };
+}
+
+const connection = mysql.createConnection(connectionConfig);
 
 const MOCK_PRODUCTS = [
     {
